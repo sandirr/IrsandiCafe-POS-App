@@ -2,6 +2,7 @@
 /* eslint-disable react/no-did-mount-set-state */
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
+import ImagePicker from 'react-native-image-picker';
 
 import {
   Container,
@@ -18,18 +19,38 @@ import {
 import {patchProduct} from '../../redux/actions/Product';
 
 class editProduct extends Component {
-  state = {
-    id: '',
-    name: '',
-    description: '',
-    category: '',
-    price: '',
-    stock: '',
+  constructor(props) {
+    super(props);
+    this.state = {
+      name: '',
+      description: '',
+      image: '',
+      category: 0,
+      price: '',
+      stock: '',
+      imageName: '',
+    };
+  }
+
+  chooseImage = () => {
+    const options = {
+      noData: true,
+    };
+    ImagePicker.launchImageLibrary(options, response => {
+      if (response.uri) {
+        this.setState({image: response, imageName: response.fileName});
+      }
+    });
+  };
+
+  onValueChange = value => {
+    this.setState({
+      category: value,
+    });
   };
 
   componentDidMount() {
     const product = this.props.navigation.getParam('product');
-
     if (product.category === 'Food') this.setState({category: 1});
     else if (product.category === 'Drink') this.setState({category: 2});
     this.setState({
@@ -40,13 +61,23 @@ class editProduct extends Component {
       id: product.id,
     });
   }
-  onValueChange = value => {
-    this.setState({
-      category: value,
-    });
-  };
+
   onSubmit = async id => {
-    await this.props.dispatch(patchProduct(this.state, id));
+    var formData = new FormData();
+    if (this.state.image.uri) {
+      const file = {
+        name: this.state.image.fileName,
+        uri: this.state.image.uri,
+        type: this.state.image.type,
+      };
+      formData.append('image', file);
+    }
+    formData.append('name', this.state.name);
+    formData.append('description', this.state.description);
+    formData.append('category', this.state.category);
+    formData.append('price', parseInt(this.state.price));
+    formData.append('stock', parseInt(this.state.stock));
+    await this.props.dispatch(patchProduct(formData, id));
     this.props.navigation.navigate('Dashboard');
   };
 
@@ -69,6 +100,12 @@ class editProduct extends Component {
                 onChangeText={text => this.setState({description: text})}
                 value={this.state.description}
               />
+            </Item>
+            <Item style={{flexDirection: 'row'}}>
+              <Button onPress={() => this.chooseImage()}>
+                <Text>Image</Text>
+              </Button>
+              <Text>{this.state.imageName}</Text>
             </Item>
             <Item>
               <Picker

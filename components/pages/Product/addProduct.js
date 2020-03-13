@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import * as ImagePicker from 'react-native-image-picker';
+import ImagePicker from 'react-native-image-picker';
 
 import {
   Container,
@@ -17,12 +17,28 @@ import {
 import {postProduct} from '../../redux/actions/Product';
 
 class addProduct extends Component {
-  state = {
-    name: '',
-    description: '',
-    category: 0,
-    price: '',
-    stock: '',
+  constructor(props) {
+    super(props);
+    this.state = {
+      name: '',
+      description: '',
+      image: '',
+      category: 0,
+      price: '',
+      stock: '',
+      imageName: '',
+    };
+  }
+
+  chooseImage = () => {
+    const options = {
+      noData: true,
+    };
+    ImagePicker.launchImageLibrary(options, response => {
+      if (response.uri) {
+        this.setState({image: response, imageName: response.fileName});
+      }
+    });
   };
 
   onValueChange = value => {
@@ -31,36 +47,21 @@ class addProduct extends Component {
     });
   };
 
-  onSubmit = async id => {
-    await this.props.dispatch(postProduct(this.state));
-    this.props.navigation.navigate('Dashboard');
-  };
-
-  choosePicture = () => {
-    var options = {
-      title: 'Choose Image',
-      storageOptions: {
-        skipBackup: true,
-        path: 'images',
-      },
+  onSubmit = () => {
+    var formData = new FormData();
+    const file = {
+      name: this.state.image.fileName,
+      uri: this.state.image.uri,
+      type: this.state.image.type,
     };
-    ImagePicker.showImagePicker(options, response => {
-      console.log('Response = ', response);
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-      } else if (response.customButton) {
-        console.log('User tapped custom button: ', response.customButton);
-      } else {
-        console.log(response.fileName);
-        // this.setState({
-        //   srcImg: {uri: response.uri},
-        //   uri: response.uri,
-        //   fileName: response.fileName,
-        // });
-      }
-    });
+    formData.append('name', this.state.name);
+    formData.append('description', this.state.description);
+    formData.append('category', this.state.category);
+    formData.append('price', parseInt(this.state.price));
+    formData.append('stock', parseInt(this.state.stock));
+    formData.append('image', file);
+    this.props.dispatch(postProduct(formData));
+    this.props.navigation.navigate('Dashboard');
   };
 
   render() {
@@ -82,10 +83,11 @@ class addProduct extends Component {
                 value={this.state.description}
               />
             </Item>
-            <Item>
-              <Button onPress={this.choosePicture}>
+            <Item style={{flexDirection: 'row'}}>
+              <Button onPress={() => this.chooseImage()}>
                 <Text>Image</Text>
               </Button>
+              <Text>{this.state.imageName}</Text>
             </Item>
             <Item>
               <Picker

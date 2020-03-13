@@ -171,7 +171,7 @@ class Cart extends React.Component {
                 </Button>
                 <Button badge active vertical>
                   <Badge>
-                    <Text>{this.props.totalPurchase}</Text>
+                    <Text>{this.props.productsInCart.length}</Text>
                   </Badge>
                   <Icon name="cart" />
                   <Text>Cart</Text>
@@ -198,7 +198,6 @@ class Cart extends React.Component {
 const mapCart = state => {
   return {
     productsInCart: state.cart.cart,
-    totalPurchase: state.cart.totalPurchase,
   };
 };
 

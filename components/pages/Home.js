@@ -5,11 +5,12 @@ import {AsyncStorage} from 'react-native';
 import {connect} from 'react-redux';
 import {getProducts} from '../redux/actions/Product';
 import {postCart} from '../redux/actions/Cart';
+import axios from 'axios';
+import {URI} from 'react-native-dotenv';
 
 import {
   Container,
   Header,
-  Title,
   Content,
   Footer,
   FooterTab,
@@ -30,7 +31,7 @@ import {
 
 import {Col, Row, Grid} from 'react-native-easy-grid';
 
-import {FlatList} from 'react-native-gesture-handler';
+import {FlatList, TouchableOpacity} from 'react-native-gesture-handler';
 
 import {} from 'react-native';
 class Homescreen extends React.Component {
@@ -40,6 +41,8 @@ class Homescreen extends React.Component {
     by: 'id',
     serachName: '',
     activeCategory: '',
+    totalProducts: 0,
+    pagination: {justifyContent: 'center', flexDirection: 'row'},
   };
 
   async getProducts() {
@@ -69,12 +72,18 @@ class Homescreen extends React.Component {
     this.getProducts();
   };
   componentDidMount() {
-    // if (AsyncStorage.getItem('token')) {
-    //   this.props.navigation.navigate('Login');
-    // }
     if (this.props.products.length < 1) {
       this.getProducts();
     }
+    axios
+      .get(`${URI}product/`)
+      .then(res => {
+        console.log(res.data.result.length);
+        this.setState({totalProducts: res.data.result.length});
+      })
+      .catch(err => {
+        console.log(err);
+      });
   }
 
   addToCart = e => {
@@ -97,6 +106,20 @@ class Homescreen extends React.Component {
       };
       this.props.dispatch(postCart(data));
     }
+  };
+  nextPage = () => {
+    data = {
+      limit: this.props.products.length + 3,
+    };
+    this.props.dispatch(getProducts(data));
+    if (data.limit > this.state.totalProducts)
+      this.setState({
+        pagination: {
+          justifyContent: 'center',
+          flexDirection: 'row',
+          display: 'none',
+        },
+      });
   };
   render() {
     return (
@@ -168,6 +191,18 @@ class Homescreen extends React.Component {
                 )}
                 keyExtractor={item => item.id.toString()}
               />
+              <View style={this.state.pagination}>
+                <Button
+                  info
+                  rounded
+                  small
+                  style={{marginVertical: 10}}
+                  onPress={() => this.nextPage()}>
+                  <Text style={{color: 'white', fontWeight: 'bold'}}>
+                    Show more
+                  </Text>
+                </Button>
+              </View>
             </Content>
             <Footer>
               <FooterTab style={{backgroundColor: '#0275d8'}}>

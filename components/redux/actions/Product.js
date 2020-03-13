@@ -1,7 +1,8 @@
 import axios from 'axios';
+import {URI} from 'react-native-dotenv';
 
 export const getProducts = data => {
-  const limit = data.limit || 5;
+  const limit = data.limit || 3;
   const page = data.activePage || 1;
   const category = data.activeCategory || '';
   const name = data.serachName || '';
@@ -12,7 +13,7 @@ export const getProducts = data => {
     type: 'GET_PRODUCT',
     payload: axios({
       method: 'GET',
-      url: `http://192.168.1.12:8181/product/?limit=${limit}&page=${page}&category=${category}&name=${name}&sort=${sort}&by=${by}&user=${user}`,
+      url: `${URI}product/?limit=${limit}&page=${page}&category=${category}&name=${name}&sort=${sort}&by=${by}&user=${user}`,
     }),
   };
 };
@@ -22,7 +23,7 @@ export const postProduct = data => {
     type: 'POST_PRODUCT',
     payload: axios({
       method: 'POST',
-      url: 'http://192.168.1.12:8181/product',
+      url: `${URI}product`,
       data: data,
     }),
   };
@@ -33,7 +34,7 @@ export const patchProduct = (newData, id) => {
     type: 'UPDATE_PRODUCT',
     payload: axios({
       method: 'PATCH',
-      url: 'http://192.168.1.12:8181/product/' + id,
+      url: `${URI}product/` + id,
       data: newData,
     }),
   };
@@ -44,7 +45,7 @@ export const deleteProduct = id => {
     type: 'DELETE_PRODUCT',
     payload: axios({
       method: 'DELETE',
-      url: 'http://192.168.1.12:8181/product/' + id,
+      url: `${URI}product/` + id,
     }),
   };
 };

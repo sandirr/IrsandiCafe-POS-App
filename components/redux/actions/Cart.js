@@ -1,5 +1,5 @@
 import axios from 'axios';
-// import uniqid from 'uniqid';
+import {URI} from 'react-native-dotenv';
 
 export const postCart = data => {
   return {
@@ -23,12 +23,11 @@ export const deleteFromCart = id => {
 };
 
 export const checkout = data => {
-  // data.idBuyer = `${uniqid()}`;
   return {
     type: 'CHECKOUT',
     payload: axios({
       method: 'POST',
-      url: 'http://192.168.1.12:8181/purchase',
+      url: `${URI}purchase`,
       data: data,
     }),
   };
