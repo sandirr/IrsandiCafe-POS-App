@@ -2,7 +2,7 @@ import axios from 'axios';
 import {URI} from 'react-native-dotenv';
 
 export const getProducts = data => {
-  const limit = data.limit || 3;
+  const limit = data.limit || 9999;
   const page = data.activePage || 1;
   const category = data.activeCategory || '';
   const name = data.serachName || '';
@@ -13,7 +13,9 @@ export const getProducts = data => {
     type: 'GET_PRODUCT',
     payload: axios({
       method: 'GET',
-      url: `${URI}product/?limit=${limit}&page=${page}&category=${category}&name=${name}&sort=${sort}&by=${by}&user=${user}`,
+      url:
+        URI +
+        `product/?limit=${limit}&page=${page}&category=${category}&name=${name}&sort=${sort}&by=${by}&user=${user}`,
     }),
   };
 };

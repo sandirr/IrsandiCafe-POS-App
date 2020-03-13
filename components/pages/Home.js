@@ -46,7 +46,7 @@ class Homescreen extends React.Component {
   };
 
   async getProducts() {
-    const data = {user: 'cashier'};
+    const data = {user: 'cashier', limit: 3};
     await this.props.dispatch(getProducts(data));
   }
 
